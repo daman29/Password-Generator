@@ -2,6 +2,8 @@
 var generateBtn = document.querySelector("#generate");
 const upperCaseLetters = [...Array(26)].map((val,i)=>String.fromCharCode(i + 65))
 const lowerCaseLetters = upperCaseLetters.map(letter => letter.toLowerCase())
+const specialCharactersString = " !\"#$%&'()*+,-./:;<=>?@[]^_`{|}~\\"
+const specialCharacters = specialCharactersString.split("")
 
 function generatePassword(){
   var passwordLength = Number(window.prompt("Please enter the password length (Minimum 8 characters and no more than 128)"))
@@ -14,6 +16,11 @@ function generatePassword(){
   var includesUpperCase = window.confirm("Include upper case?")
   var includesNumeric = window.confirm("Include numbers?")
   var includesSpecialCharacters = window.confirm("Include special characters?")
+
+  if(!includesLowerCase && !includesUpperCase && !includesNumeric && !includesSpecialCharacters){
+    window.alert("Please select atleast one character type")
+    generatePassword()
+  }
 
   if(includesLowerCase){
 
