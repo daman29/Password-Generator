@@ -6,8 +6,9 @@ const lowerCaseLetters = upperCaseLetters.map(letter => letter.toLowerCase()) //
 const specialCharactersString = " !\"#$%&'()*+,-./:;<=>?@[]^_`{|}~\\" //special characters string
 const specialCharacters = specialCharactersString.split("") //turn special characters string to array
 const numbers = [0,1,2,3,4,5,6,7,8,9] //numbers array
-const wrongLength = "Please use a numeric password length of minimum 8 characters and maximum 128" //wrong length alert
+const wrongLength = "Please use a length of minimum 8 characters and maximum 128" //wrong length alert
 const lengthPrompt = "Please enter the password length (Minimum 8 characters and no more than 128)" //length prompt
+const wrongType = "Please use a numeric password length" //wrong type alert
 
 var localPasswordPosition //Array to build an index array same length as the password
 var localPasswordArray //Array to hold the local password
@@ -19,16 +20,22 @@ function generatePassword(){
   var passwordLengthPrompt = window.prompt(lengthPrompt) //Prompt user to enter password length
   var passwordLength = Number(passwordLengthPrompt) //convert input to number
 
+  //check if number is provided
+  if(isNaN(passwordLength)){
+    window.alert(wrongType)
+    generatePassword() //Restart the function to prompt again
+    return localPasswordString
+  }
   //If password length prompt is cancelled return function
   if (!passwordLengthPrompt){
-    return
+    return localPasswordString //Return the current call so the call stack doesn't build
   }
 
   //If password length doesn't meet the length criteria then alert the user and type of number
-  if(passwordLength<8 || passwordLength>128 || isNaN(passwordLengthPrompt)){
+  if(passwordLength<8 || passwordLength>128){
     window.alert(wrongLength)
     generatePassword() //Restart the function to prompt again
-    return //Return the current call so the call stack doesn't build
+    return localPasswordString //Return the current call so the call stack doesn't build
   }
   
   //Ask the user if they want to include lower case letters as a criteria
@@ -68,7 +75,7 @@ function generatePassword(){
   if(!includesLowerCase && !includesUpperCase && !includesNumeric && !includesSpecialCharacters){
     window.alert("Please select at least one character type")
     generatePassword() //Re run the function
-    return //Return the current call so the call stack doesn't build
+    return localPasswordString
   }
 
   //define the length of the local password array and local password position array
@@ -99,12 +106,20 @@ function checkCriteria(includesLower, includesUpper, includesNumber, includesSpe
     finalCheck = true //sets to true if all criteria met then while loop stops
     if(includesLower){ //check if the lower case criteria is selected
       var checkOne  = localPasswordArray.some(r=>lowerCaseLetters.includes(r)) //check if a lower case letter is in the password
-      if(!checkOne){ //if no lower case letters found in the password then run this
+      if(!checkOne){ //if no lower case letters found in the password then replace a random character in the password with a random lower case letter
         var firstIndex = randomIndex(passLength)
         localPasswordArray[firstIndex] = randomCharacterSelector(lowerCaseLetters) //replace a random character in the password with a random lowercase letter
         finalCheck = false
       }
     }
+    // If the lower case letter replaces a character which was the only one for another criteria it keeps running the while loop until all selected characters appear at least once.
+    // For example
+    // original password assuming all criteria was selected as true = 45#6HHAZ => no lower case letters are in the password
+    // Therefore lets say randomly "#" gets replaced by "p" now there is no special character in the password = 45p6HHAZ
+    // This while loop has memory to then select a random different location not [2] to replace with a special character
+    // This occurs till all criteria is met
+
+
     if(includesUpper){ //same behavior as above
       var checkTwo  = localPasswordArray.some(r=>upperCaseLetters.includes(r))
       if(!checkTwo){
